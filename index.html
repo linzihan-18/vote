@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>设备委员会委员投票</title>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f2f3f5;color:#1d2129;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.view{display:none}.view.active{display:block}
+button{font-family:inherit}
+.hero{background:linear-gradient(135deg,#1565c0,#2b8ef0);color:#fff;padding:44px 24px 40px}
+.hero h1{font-size:21px;margin:0 0 8px;font-weight:600}
+.hero p{margin:0;opacity:.88;font-size:13px}
+.form-card{background:#fff;margin:-18px 12px 0;border-radius:14px;padding:20px 16px;box-shadow:0 2px 14px rgba(0,0,0,.07);position:relative;z-index:2}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:#4e5969;margin-bottom:7px;font-weight:500}
+.field input{width:100%;height:48px;border:1px solid #e5e6eb;border-radius:10px;padding:0 14px;font-size:16px;outline:none;background:#f7f8fa}
+.field input:focus{border-color:#1565c0;background:#fff}
+.req{color:#f53f3f}
+.btn{border:none;border-radius:10px;font-size:15px;font-weight:500;padding:0 18px;height:48px;cursor:pointer}
+.btn.primary{background:#1565c0;color:#fff}.btn.primary:active{background:#0d47a1}
+.btn.ghost{background:#fff;color:#1565c0;border:1px solid #1565c0}
+.btn.danger{background:#f53f3f;color:#fff}
+.btn.block{width:100%;display:block}
+.btn:disabled{opacity:.5}
+.stat-bar{display:flex;margin:20px 16px 0;background:#fff;border-radius:12px;padding:16px 0}
+.stat-bar>div{flex:1;text-align:center}
+.stat-bar b{display:block;font-size:22px;color:#1565c0;font-weight:700}
+.stat-bar span{font-size:12px;color:#86909c}
+.foot-note{text-align:center;font-size:12px;color:#a8adb5;padding:22px 30px 40px;line-height:1.7}
+.topbar{position:sticky;top:0;z-index:20;background:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eef0f2}
+.tb-title{font-size:16px;font-weight:600}
+.tb-sub{font-size:12px;color:#86909c;margin-top:2px}
+.tb-prog{font-size:13px;color:#86909c}
+.tb-prog b{color:#1565c0;font-size:20px;font-weight:700}
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid #eef0f2;position:sticky;top:57px;z-index:19;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:11px 15px;font-size:13px;color:#86909c;white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer}
+.tab.on{color:#1565c0;border-bottom-color:#1565c0;font-weight:600}
+.tab .badge{display:inline-block;background:#1565c0;color:#fff;border-radius:9px;font-size:10px;padding:0 5px;margin-left:5px;line-height:15px}
+.tab .badge.done{background:#00b42a}
+.sheet-head{display:flex;align-items:baseline;justify-content:space-between;padding:14px 16px 8px}
+.sh-title{font-size:15px;font-weight:700}
+.sh-count{font-size:12px;color:#86909c}
+.sheet-ops{display:flex;gap:8px;padding:0 16px 10px;flex-wrap:wrap}
+.op{border:1px solid #d8dce3;background:#fff;color:#4e5969;font-size:12px;padding:6px 12px;border-radius:16px;cursor:pointer}
+.op[data-op="yes"]{color:#00a03e;border-color:#b7e6c6}
+.op[data-op="no"]{color:#d03050;border-color:#f5c2cc}
+.list{padding:0 12px 130px}
+.item{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:10px;border:1px solid #eef0f2}
+.item.yes{border-color:#00b42a;background:#f7fffa}
+.item.no{border-color:#f53f3f;background:#fff9f9}
+.item-top{display:flex;gap:8px;align-items:flex-start}
+.idx{flex:0 0 auto;min-width:24px;height:22px;border-radius:6px;background:#f2f3f5;color:#86909c;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600;padding:0 5px}
+.item.yes .idx{background:#00b42a;color:#fff}
+.item.no .idx{background:#f53f3f;color:#fff}
+.name{font-size:15px;font-weight:600;flex:1;word-break:break-all}
+.meta{font-size:11px;color:#86909c;margin-top:7px;display:flex;flex-wrap:wrap;gap:5px}
+.tag{background:#f2f3f5;border-radius:4px;padding:1px 6px;color:#4e5969}
+.tag.cat{background:#e8f3ff;color:#1565c0}
+.tag.imp{background:#fff7e8;color:#d25f00}
+.price{margin-top:8px;font-size:13px;color:#4e5969}
+.price b{color:#e64545;font-size:15px;font-weight:700}
+.note{font-size:12px;color:#86909c;margin-top:6px}
+.btns{display:flex;gap:10px;margin-top:12px}
+.vbtn{flex:1;height:40px;border-radius:9px;border:1px solid #e5e6eb;background:#fff;font-size:14px;color:#4e5969;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vbtn.yes.active{background:#00b42a;border-color:#00b42a;color:#fff;font-weight:600}
+.vbtn.no.active{background:#f53f3f;border-color:#f53f3f;color:#fff;font-weight:600}
+.bottombar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;border-top:1px solid #eef0f2}
+.bottombar .btn.primary{flex:1}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:flex-end}
+.modal-box{background:#fff;width:100%;border-radius:18px 18px 0 0;padding:20px 16px calc(16px + env(safe-area-inset-bottom));max-height:94vh;overflow-y:auto}
+.mb-title{font-size:17px;font-weight:700;text-align:center}
+.mb-tip{font-size:12px;color:#86909c;text-align:center;margin-top:8px}
+.sign-stats{display:flex;justify-content:center;gap:16px;margin-top:14px;font-size:13px}
+.sign-stats .ok{color:#00a03e;font-weight:600}
+.sign-stats .bad{color:#d03050;font-weight:600}
+.sign-stats .gray{color:#86909c}
+#signPad{width:100%;height:200px;border:1.5px dashed #c9cdd4;border-radius:12px;touch-action:none;background:#fcfcfd;display:block;margin:14px 0 4px}
+.sign-hint{font-size:11px;color:#c0c4cc;text-align:center;margin-bottom:14px}
+.sign-ops{display:flex;gap:10px}
+.done-wrap{padding:60px 20px 40px;text-align:center}
+.done-icon{width:72px;height:72px;border-radius:50%;background:#00b42a;color:#fff;font-size:38px;line-height:72px;margin:0 auto 20px}
+.done-wrap h2{font-size:20px;margin:0 0 8px}
+.done-wrap p{font-size:13px;color:#86909c;margin:0 0 24px}
+.done-stats{background:#fff;border-radius:12px;padding:18px 0;display:flex;margin-bottom:24px}
+.done-stats>div{flex:1}
+.done-stats b{display:block;font-size:20px;font-weight:700}
+.done-stats span{font-size:12px;color:#86909c}
+.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:14px;gap:16px}
+.spinner{width:38px;height:38px;border:3px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.admin-wrap{padding:16px}
+.admin-head{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px}
+.admin-head h2{margin:0 0 8px;font-size:17px}
+.admin-list{background:#fff;border-radius:12px;overflow:hidden}
+.admin-row{padding:14px 16px;border-bottom:1px solid #eef0f2;display:flex;align-items:center;justify-content:space-between}
+.admin-row:last-child{border-bottom:none}
+.admin-row .nm{font-size:15px;font-weight:600}
+.admin-row .tm{font-size:12px;color:#86909c;margin-top:4px}
+.admin-row .st{font-size:12px;margin-top:4px}
+.admin-row .st .y{color:#00a03e}
+.admin-row .st .n{color:#d03050}
+.admin-row .st .a{color:#86909c}
+.empty{text-align:center;padding:60px 20px;color:#86909c}
+</style>
+</head>
+<body>
+
+<div id="view-home" class="view"></div>
+<div id="view-vote" class="view"></div>
+<div id="view-done" class="view"></div>
+<div id="view-admin" class="view"></div>
+<div id="view-adminlogin" class="view"></div>
+
+<script>
+/* ============================================================
+   0. 配置（只需修改这三项）
+   ============================================================ */
+const CONFIG = {
+  supabaseUrl: 'https://zllqmwlqbwygxljueomf.supabase.co',   // 例：https://xxxx.supabase.co
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsbHFtd2xxYnd5Z3hsanVlb21mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mjk2NTcsImV4cCI6MjEwNTIwNTY1N30.baXSubeakYnjOmor3FOFOC_iHpbpbt4Fvr2TKUeEwtI',   // anon public key
+  adminPassword: 'ygc'  // 管理员密码，自行修改
+};
+
+/* ============================================================
+   1. 原始数据（紧凑格式：批次名|type，每行用 | 分隔字段）
+   ============================================================ */
+const RAW_DATA = `
+#2027年度自有资金第一批|
+西城|内镜中心|内镜下胃底折叠术系统|首配|150|1|国产|
+西城|干保处|隔音室|更新|30|1|国产|
+顺义|内镜中心|胶囊式小肠内窥镜系统|新增|25|1|国产|
+西城|呼吸内科|电子支气管镜|新增|45|1|进口|高清支气管镜
+西城|康复科|心肺运动测试系统|更新|50|1|国产|
+通州|副中心门诊部|人体成分分析仪|新增|25|1|国产|
+西城|心内科|心脏脉冲电场消融仪|首配|50|1|进口|
+通州|心内科|心脏脉冲电场消融仪|首配|50|1|进口|
+顺义|心内科|心脏脉冲电场消融仪|首配|50|1|国产|
+西城|内镜中心|纯水机|新增|15|1|国产|
+西城|麻醉手术中心|医用升温毯|新增|2|3|国产|
+西城|消毒供应中心|全自动连续封口机|更新|7|2|国产|
+通州|麻醉手术中心|医用升温毯|新增|2|2|国产|
+顺义|麻醉手术中心|医用升温毯|新增|2|1|国产|
+西城|消毒供应中心|超声清洗机|新增|19.8|1|国产|
+顺义|泌尿外科|内窥镜手术动力设备|新增|40.5|1|国产|包含粉碎镜、刀头
+西城|内镜中心|管腔器械检测工作站|首配|8|1|国产|
+西城|内镜中心|ATP荧光检测仪|新增|13|1|国产|
+西城|麻醉手术中心|手术床|更新|60|1|进口|用于复杂疑难手术
+西城|麻醉手术中心|手术转运床|更新|3|10|国产|
+西城|麻醉手术中心|体位垫|更新|2.77|3|国产|全套，其中俯卧位垫（高）
+西城|麻醉手术中心|体位垫|更新|2.97|3|国产|全套，其中俯卧位垫（高）
+顺义|麻醉手术中心|体位垫|新增|0.5|3|国产|半包围系列头枕
+顺义|麻醉手术中心|体位垫|新增|0.68|1|国产|镜面头枕
+顺义|麻醉手术中心|体位垫|新增|0.68|3|国产|俯卧位垫（低）
+顺义|麻醉手术中心|体位垫|新增|0.13|4|国产|儿童硅胶头圈
+顺义|麻醉手术中心|体位垫|新增|0.6|2|国产|儿童半包围头枕
+顺义|麻醉手术中心|体位垫|新增|0.36|2|国产|半圆形体位垫
+顺义|麻醉手术中心|体位垫|新增|0.62|1|国产|半圆形体位垫
+顺义|麻醉手术中心|体位垫|新增|0.56|9|国产|手术床垫
+顺义|放疗科|立体定向治疗端到端检测系统|首配|80|1|国产|
+顺义|放疗科|SBRT患者固定系统|首配|24|2|国产|碳纤维
+西城|医保内科|有创呼吸机|更新|25|1|国产|
+西城|医保神经内科|心电监护仪|更新|68|1|国产|一拖八
+西城|医保神经内科|无创呼吸机|更新|13|1|国产|
+西城|急诊科|中央监护系统|更新|45|1|国产|一拖五
+通州|副中心门诊部|动态血压监护仪|新增|1.7|5|国产|
+通州|副中心门诊部|动态心电图记录器|新增|1.7|5|国产|
+通州|普外分中心|人体成分分析仪|新增|25|1|国产|
+西城|泌尿外科|内窥镜手术动力设备|新增|11|2|国产|包含旋切手件及刀头
+西城|重症医学科|精密输液泵|更新|1|14|国产|
+西城|急诊科|医用转移车|更新|3|10|国产|
+通州|普外分中心|体腔热灌注治疗系统|新增|28|1|国产|
+西城|放射介入科|转运床|新增|0.58|1|国产|
+顺义|骨科|手术头架|新增|10|1|国产|
+顺义|骨科|动力刨削系统|新增|5|1|国产|手柄
+西城|检验科|全自动核酸提取仪（分子流水线）|首配|30|1|国产|
+通州|消化内科|转运监护仪|新增|3.5|1|国产|
+西城|消化内科|除颤仪|新增|3.5|1|国产|
+顺义|内镜中心|腔内碎石系统|首配|24|1|国产|
+顺义|肾内科|透析专用人体成分分析仪|新增|7|1|进口|
+西城|病理科|半自动轮转切片机|新增|12|1|国产|
+通州|病理科|半自动轮转切片机|新增|12|1|国产|
+西城|耳鼻咽喉头颈外科|眼震视图仪|更新|60|1|进口|
+通州|消毒供应中心|真空全自动清洗消毒器|更新|65|1|国产|
+顺义|耳鼻咽喉头颈外科|4K软式动态喉镜|新增|50|1|进口|
+西城|耳鼻咽喉头颈外科|听力筛查仪|新增|30|1|进口|
+西城|普外分中心|等离子手术设备|新增|0.3|1|国产|
+西城|呼吸内科|超声内镜系统|首配|60|1|国产|用于支气管
+西城|重症医学科|精密输液泵|更新|1|19|国产|
+通州|重症医学科|电动监护病床|新增|10|3|国产|
+通州|重症医学科|床旁监护仪|新增|20|3|国产|
+西城|口腔科|口腔数字印模仪|首配|15|1|国产|
+通州|口腔科|口腔数字印模仪|首配|15|1|国产|
+西城|健康体检中心|妇科检查床|更新|2.5|1|国产|
+西城|国际医疗中心|医用防褥疮气垫|更新|0.2|1|国产|
+西城|国际医疗中心|动力马达|新增|1|1|国产|
+西城|国际医疗中心|超声牙周治疗仪|新增|4|1|国产|
+西城|妇产科|经皮黄疸仪|更新|2|2|国产|
+西城|检验科|自动加样系统|首配|20|1|国产|
+通州|检验科|全自动化学发光免疫分析仪|新增|15|1|国产|
+通州|内镜中心|碳十三呼气检测仪|更新|1|1|国产|
+通州|内镜中心|管腔器械检测工作站|首配|8|1|国产|
+顺义|内镜中心|管腔器械检测工作站|首配|8|1|国产|
+通州|内镜中心|ATP荧光检测仪|新增|13|1|国产|
+顺义|内镜中心|ATP荧光检测仪|新增|13|1|国产|
+西城|妇产科|产后康复治疗仪|更新|7|2|国产|
+西城|胸外科|无线多参数中央监护系统|新增|40|1|国产|一拖八
+西城|病理科|显微成像系统|新增|10|2|国产|
+通州|病理科|显微成像系统|新增|10|1|国产|
+西城|妇产科|高频等离子手术系统|新增|38|1|国产|含3套电切镜
+顺义|检验科|全自动推阅片机系统|新增|50|1|国产|
+顺义|输血科|血液成分分离机|新增|47|1|进口|
+西城|胸外科|呼吸康复管理系统|首配|55|1|国产|呼吸训练器*10，便携式肺功能仪*1
+西城|药剂科|冷藏冰箱|新增|2.8|1|国产|
+西城|眼科|电脑角膜验光仪|更新|10|1|国产|
+顺义|药剂科|半片药品辅助添加系统|新增|50|1|国产|台式
+顺义|整形美容外科|脂肪吸引器|首配|45|1|国产|
+西城|整形美容外科|取皮植皮系统|首配|45|1|国产|
+通州|医学工程处|气流分析仪|新增|21.93|1|进口|带麻醉气体测量模块
+通州|医学工程处|多参数模拟器|新增|13|1|进口|
+西城|眼科|免散瞳眼底照相|更新|30|1|进口|
+通州|重症肝病科|电动监护病床|新增|10|4|国产|带称重功能
+西城|眼科|心电监护仪|新增|2.5|1|进口|
+顺义|血液内科|层流床|新增|3|5|国产|单人无菌室
+通州|重症肝病科|医用升温毯|新增|2|3|国产|
+西城|耳鼻咽喉头颈外科|前庭肌源诱发电位|更新|60|1|进口|
+通州|重症医学科|层流床|新增|2.95|2|国产|单人无菌室
+西城|麻醉手术中心|红外荧光显像仪|首配|40|1|国产|
+西城|输血科|全自动血小板抗体检测仪|新增|20|1|国产|
+通州|药剂科|医用冷藏箱|新增|2.2|1|国产|
+西城|国际医疗中心|根长测量仪|新增|0.7|1|国产|
+西城|国际医疗中心|无线光固化灯|新增|0.4|1|国产|
+西城|妇产科|宫腔内窥镜|新增|6.5|1|国产|
+通州|医学工程处|电气安全分析仪|新增|5.85|1|国产|
+西城|妇产科|医用灌注泵|新增|8|1|国产|
+顺义|骨科|电动骨组织手术设备|新增|35|1|国产|网电源供电
+通州|妇产科|电切镜|新增|7|2|国产|
+西城|呼吸内科|低温手术系统|首配|45|1|国产|
+西城|呼吸内科|电子内窥镜图像处理器|首配|1.5|1|国产|
+西城|重症医学科|内窥喉镜|新增|0.3|2|国产|
+西城|重症医学科|监护除颤仪|更新|5|1|国产|
+西城|重症医学科|医用微网雾化器|新增|0.16|3|国产|
+通州|耳鼻咽喉头颈外科|耳鼻喉综合治疗台|新增|45|1|国产|
+顺义|皮肤性病科|射频治疗仪|首配|130|1|进口|热玛吉
+通州|重症医学科|医用微网雾化器|新增|0.16|2|国产|
+顺义|检验科|分拣机|新增|15|1|国产|
+西城|医保中心检验科|全自动免疫印迹仪|新增|9|1|国产|
+通州|麻醉手术中心|红外荧光显像仪|首配|40|1|国产|
+通州|普外分中心|加长腹腔镜|首配|11.2|2|国产|
+西城|国际医疗中心|数字式十二道心电图机|新增|2.8|2|国产|
+西城|病理科|捞烤一体机|新增|1|1|国产|
+通州|病理科|捞烤一体机|新增|1|1|国产|
+顺义|麻醉手术中心|多导睡眠记录系统|新增|40|1|国产|
+顺义|麻醉手术中心|血流动力学监测仪|新增|55|1|国产|
+通州|超声科|下肢血管功能不全诊疗系统|新增|42|1|国产|
+西城|医保内科|遥测中心监护仪|新增|5.5|5|进口|
+西城|医保内科|高流量呼吸湿化治疗仪|新增|4|4|国产|
+西城|医保内科|输液加温仪|新增|3.5|2|国产|
+西城|眼科|非接触球面镜|首配|55|1|国产|
+西城|急诊科|有创呼吸机|新增|15|2|国产|
+西城|泌尿外科|等离子电切内窥镜|新增|8.5|3|国产|包含激光手件
+通州|口腔科|印模调拌机|新增|0.6|1|国产|
+西城|神经内科|重复经颅磁刺激仪|新增|35|1|国产|
+西城|麻醉手术中心|空气波压力治疗仪|新增|2|2|国产|
+西城|儿科|可视喉镜|新增|3|1|国产|
+通州|儿科|可视喉镜|新增|3|1|国产|
+顺义|中医科|中药熏蒸治疗机|新增|5.5|1|国产|
+西城|血液内科|除颤仪|新增|3.5|1|国产|
+西城|医保神经内科|记忆泡沫床垫|新增|1.4|2|国产|
+西城|风湿内科|微循环显微数字成像系统|首配|15|1|国产|
+西城|国际医疗中心|呼吸分析仪|新增|0.99|1|国产|
+通州|国际医疗中心|呼吸分析仪|新增|0.99|1|国产|
+通州|医保内科|心电图机|新增|3|1|国产|
+通州|医保内科|人体成分分析仪|新增|25|1|国产|
+西城|呼吸内科|微波消融仪|新增|1.5|1|国产|
+顺义|重症医学科|血滤机|新增|20|1|国产|
+顺义|重症医学科|血气分析仪|新增|5|1|国产|
+西城|妇产科|手术无影灯|更新|3.5|5|国产|单灯
+西城|妇产科|手术无影灯|更新|8|1|国产|子母灯
+西城|医保神经内科|防褥疮气垫|更新|0.2|5|国产|
+通州|普外分中心|心电图机|更新|3|1|进口|
+通州|骨科|碳纤维板|首配|45|1|进口|
+通州|输血科|全自动血小板抗体检测仪|新增|20|1|国产|
+西城|整形美容外科|负压引流专用吸引机|新增|1|1|国产|
+西城|麻醉手术中心|手术床|更新|40|1|国产|用于普通常规手术
+通州|神经内科|重复经颅磁刺激仪|新增|35|1|国产|
+西城|急诊科|输液泵塔|新增|9.5|2|国产|
+西城|医保内科|动脉硬化检测仪|更新|25|2|国产|
+西城|普外分中心|肌电诱发电位仪|新增|35|1|国产|
+西城|病理科|全自动冰冻免疫组化染色机|首配|10|1|国产|
+通州|病理科|全自动染色封片一体机|新增|60|1|国产|
+西城|病理科|全自动染色封片一体机|新增|60|1|国产|
+顺义|麻醉手术中心|医用臭氧治疗仪|新增|25|1|国产|
+西城|超声科|射频消融仪|新增|40|1|国产|
+西城|医保内科|排痰机|更新|4.5|5|国产|
+西城|口腔科|儿童牙椅|首配|9|1|国产|
+西城|口腔科|牙科显微镜|新增|25|1|国产|
+顺义|骨科|气压止血器|新增|9|2|国产|
+西城|普外分中心|心电图机|更新|3|3|国产|
+西城|妇产科|电动手术床|更新|14|1|国产|
+通州|骨科|动力手柄|新增|9.8|1|进口|
+顺义|神经内科|重复经颅磁刺激仪|新增|35|1|国产|
+西城|麻醉手术中心|纯水机|新增|6|1|国产|
+顺义|血液内科|心电监护仪|新增|2.5|5|国产|
+西城|急诊外科病房|医用微网雾化器|新增|0.16|2|国产|
+通州|妇产科|宫腔内窥镜|新增|6.5|2|国产|
+西城|医保中心检验科|全自动化学发光免疫分析仪|新增|9|1|国产|
+顺义|妇产科|宫腔镜冷刀系统|新增|18|1|国产|
+西城|肿瘤科|红光治疗仪|新增|4|1|国产|
+西城|肿瘤科|砭石刮痧器|首配|0.25|2|国产|
+西城|口腔科|印模调拌机|新增|0.6|1|国产|
+顺义|麻醉手术中心|血气血氧电解质和代谢物分析仪|新增|5|1|国产|
+西城|麻醉手术中心|胸骨锯|更新|18|2|进口|
+通州|医保内科|动脉硬化检测仪|新增|25|1|国产|
+西城|国际医疗中心|半导体激光仪|新增|19|1|国产|用于口腔
+#2027年度自有资金第二批|
+西城|皮肤性病科|聚焦超声治疗仪|首配|110|1|国产|超声炮
+通州|重症医学科|血滤机|新增|20|1|国产|
+顺义|康复科|四肢抗阻测试与训练系统|首配|55|1|国产|
+通州|妇产科|光学阴道镜|新增|40|1|国产|
+西城|检验科|全自动血细胞分析仪|更新|10|4|国产|
+西城|整形美容外科|电动取皮刀|首配|13|1|国产|
+顺义|神经外科|肌电图诱发电位仪|新增|48|1|国产|
+西城|血管外科|静脉腔内射频闭合治疗系统|首配|9.8|1|国产|
+西城|皮肤性病科|二氧化碳激光治疗机|更新|28|1|国产|
+西城|皮肤性病科|高频电灼仪|首配|70|1|国产|腋臭治疗仪
+顺义|皮肤性病科|电动手术动力系统|首配|35|1|国产|用于毛发移植、皮肤瘢痕组织切割
+西城|检验科|血气血氧电解质和代谢物分析仪|更新|5|2|国产|
+顺义|超声科|下肢血管功能不全诊疗系统|新增|42|1|国产|
+西城|儿科|超声骨密度仪|更新|27|1|国产|
+通州|妇产科|膀胱容量测定仪|首配|12|1|国产|
+通州|妇产科|诊疗宫腔镜|新增|10|2|国产|
+西城|健康管理中心|超声诊断仪|更新|120|1|国产|
+西城|国际医疗中心|眼科光学相干断层扫描仪|新增|240|1|国产|
+西城|国际医疗中心|眼科激光光凝机|新增|160|1|进口|
+西城|国际医疗中心|眼底造影机|新增|98|1|国产|
+#顺义重症医学科八部|
+顺义|重症医学科八部|智能药柜主柜|新增|25|1|国产|
+顺义|重症医学科八部|智能药柜副柜|新增|24|3|国产|
+顺义|重症医学科八部|电动监护病床|新增|10|10|国产|
+顺义|重症医学科八部|精密输液泵|新增|1|10|国产|
+顺义|重症医学科八部|精密注射泵|新增|1|10|国产|
+顺义|重症医学科八部|有创呼吸机|新增|25|5|国产|高端
+顺义|重症医学科八部|有创呼吸机|新增|15|5|国产|中端
+顺义|重症医学科八部|血气分析仪|新增|5|1|国产|
+顺义|重症医学科八部|内窥喉镜|新增|0.3|3|国产|
+顺义|重症医学科八部|血滤机|新增|20|3|国产|
+顺义|重症医学科八部|电子气管插管镜|新增|12|2|国产|可视软性喉镜
+顺义|重症医学科八部|视频喉镜|新增|12|1|国产|
+顺义|重症医学科八部|转运呼吸机|新增|15|2|国产|
+顺义|重症医学科八部|肠内营养泵|新增|0.5|5|国产|
+顺义|重症医学科八部|便携式彩色超声诊断仪|新增|40|1|国产|
+顺义|重症医学科八部|控温毯|新增|4|1|国产|
+顺义|重症医学科八部|心肺复苏机|新增|20|1|国产|
+顺义|重症医学科八部|呼吸湿化治疗仪|新增|4|3|国产|
+顺义|重症医学科八部|气囊测压表|新增|0.2|2|国产|
+顺义|重症医学科八部|便携式电动吸引器|新增|3|1|国产|
+顺义|重症医学科八部|转运床|新增|3|1|国产|
+顺义|重症医学科八部|下肢驱动泵|新增|5|2|国产|
+顺义|重症医学科八部|医用微网雾化器|首配|0.16|1|国产|
+顺义|重症医学科八部|铅屏风|新增|1|2|国产|
+#重点专科|
+西城|泌尿外科|3D4K内窥镜荧光摄像系统|新增|105|1|国产|
+顺义|泌尿外科|数字玻片扫描系统|首配|80|1|国产|
+顺义|泌尿外科|快速转膜仪|首配|10.8|1|国产|
+顺义|泌尿外科|医用冷藏箱|新增|1.6|1|国产|2-8℃
+#2027-2029年度医用设备维保|maint
+通州|放射科|X线电子计算机断层扫描装置|3221100002025040002|飞利浦|Brilliance iCT|2499|3|138|整机全保
+通州|放射科|X线电子计算机断层扫描装置|3221105002025040001|飞利浦|Ingenuity CT|1199.6|3|100|整机全保
+顺义|放射科|X线电子计算机断层扫描装置|3221105002023120002|飞利浦|Incisive CT|600|3|95|整机全保
+西城|放射科|X线电子计算机断层扫描装置|3229900002023120019|飞利浦|Incisive CT Power|399.98|3|85|整机全保
+西城|麻醉手术中心|医用血管造影X射线机|3221201002025040001|飞利浦|UNIQ FD20|864|3|64|整机全保
+通州|放射科|医用核磁共振成像设备|3221001002025040001|飞利浦|Multiva 1.5T|1199.6|3|98|整机全保
+通州|副中心门诊部|数字化医用X射线摄影系统|3221101020032019030001|飞利浦|Digital Diagnost 3|319.8|3|24|整机全保
+通州|放射科导管室|医用血管造影X射线机（附带定位CT）|3221102040012021060001|西门子|Somatom-Artis zee III+Somatom confidence|1199|3|115|整机全保（含20排CT）
+西城|放射科|数字化医用X射线摄影系统|3221101072024100002|西门子|Ysio Max|299|3|25|整机全保
+通州|放射科|数字化医用X射线摄影系统|3221103002025040002|西门子|Multix Fusion|280|3|16|整机全保
+通州|副中心门诊部|X线电子计算机体层摄影设备|3221105000012019050001|西门子|SOMATOM Force|2599|3|160|整机全保
+顺义|放射科|X线电子计算机断层扫描装置|3229900002024010574|西门子|SOMATOM Force|1999.9|3|160|整机全保
+通州|放射科|医用核磁共振成像设备|3221001002023120002|联影|uMR870|1799.9|3|95|整机全保
+通州|放射科|数字化医用X射线摄影系统|3221102002025040003|联影|uDR770i|179.8|3|13|整机全保
+顺义|放射科|X线电子计算机断层扫描装置|3221601092023120003|联影|uCT960+|1999.9|3|125|整机全保
+顺义|放射科|X线电子计算机断层扫描装置|3221601092023120002|联影|Uct710|300|3|30|整机全保
+顺义|放射科|医用血管造影X射线机|3221102042023120002|佳能|Alphenix INFX-9000V|999.8|3|78|整机全保，包含巨屛
+通州|放射科|X线电子计算机断层扫描装置|3221105000012019080001|佳能|Aquilion ONE TSX-301C|2597|3|165|整机全保
+顺义|放射科|X线电子计算机断层扫描装置|3229900002023120773|GE|Revolution CT|2000|3|140|整机全保
+顺义|内镜中心|下球管数字平板X射线机|3221101022024010001|GE|OEC Elite CFDx|450|3|9|不含球管和探测器
+通州|放射科|数字化乳腺诊断X线机|3221101002025040005|GE|GE Senographe Essential|307.2|3|21|不含球管
+顺义|核医学科|单光子发射及X射线计算机断层成像系统|3221105002024060001|GE|NM/CT 860|900|2|58|整机全保
+通州|麻醉手术中心|内窥镜手术控制系统（达芬奇手术机器人）|3220799990012020110001|直观复星|DA VINCI IS4000|2500|3|115|整机全保
+西城|内镜中心|电子消化内镜系统|/|奥林巴斯|CV-290等|16992.9|1|145|整机全保
+通州|内镜中心|电子消化内镜系统|/|奥林巴斯|CV-290等|6974.3|1|139|整机全保
+顺义|内镜中心|电子消化内镜系统|/|奥林巴斯|CV-290等|2608.75|1|41|整机全保
+顺义|呼吸内科|电子气管镜系统|3220799002023120005|奥林巴斯|CV-290等|280|1|6.5|整机全保
+顺义|超声心动室|超声心动图仪|3220501072023120004|GE|Vivid E95|260|3|15.5|整机全保
+西城|超声心动室|超声心动图仪|3220501072023120001|GE|Vivid E95|260|3|15.5|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032023120025|GE|Voluson E10|200|3|10|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032023120026|GE|Voluson E8|160|3|9.7|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501030032019020001|GE|VOLUSON E8|188|3|9.7|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030032023080003|GE|LOGIQ e|21.2|3|3.5|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501002025040033|GE|VOLUSON E10|275.5|3|10|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501002025040034|GE|VOLUSON E10|275.5|3|10|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501002025040032|GE|LOGIQ E9|209.6|1|8.7|整机全保
+顺义|超声心动室|超声心动图仪|3220501072024120001|飞利浦|EPIQ CVx|280|3|13.8|整机全保
+西城|麻醉手术中心|彩色多普勒超声诊断仪|3220501070012013100001|飞利浦|IE33|249|3|13.5|整机全保
+通州|医保中心超声科|彩色多普勒超声诊断仪|3220501032023120016|飞利浦|EPIQ 7|200|3|12|整机全保
+西城|体检中心|彩色多普勒超声诊断仪|3229900000012023120016|飞利浦|EPIQ 5|200|3|11|整机全保
+西城|体检中心|彩色多普勒超声诊断仪|3220501032023120004|飞利浦|Affiniti50|100|3|7.6|整机全保
+西城|体检中心|彩色多普勒超声诊断仪|3220501032023120005|飞利浦|Affiniti50|60|3|7.6|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030022015010002|飞利浦|iU Elite|179.8|1|10|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030022014050002|飞利浦|iU Elite|259.8|1|10|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501002025040015|飞利浦|Affiniti70|159.98|1|8.5|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032023120030|迈瑞|Resona R7T|100|3|10.5|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032023120031|迈瑞|Resona R7T|100|3|10.5|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032023120032|迈瑞|Resona R7T|100|3|10.5|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501030022020010001|迈瑞|Resona 7|149.9|3|10|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501030022020010002|迈瑞|Resona 7|149.9|3|10|整机全保
+西城|超声科|便携式超声诊断仪|3220501040042021030001|迈瑞|M8|50|3|6.5|整机全保
+西城|放射科|X线电子计算机断层扫描装置|3221601092024020001|东软|Neu Viz Extra|400|3|52|整机全保
+西城|放射科|医用核磁共振成像设备|3221001000012023050002|万东|i-Field1.48T|399.8|3|38|整机全保
+通州|放射科|数字胃肠机|3221102002025040005|万东|DRF-2B|170|3|13|整机全保
+通州|眼科|激光扫描检眼镜|3220401020022019020001|Optos|Daytona (P200T)|139.7|3|7.5|整机全保
+通州|医保中心一门诊眼科|激光扫描检眼镜|3220601062023120002|Optos|Daytona (P200T)|140|3|7.5|整机全保
+顺义|眼科|超广角眼底造影系统|3220401362024010001|Optos|P200DTx、A10650 FA|260|3|14|整机全保
+西城|眼科|激光眼科诊断仪|3220401380022016120001|海德堡|Spectralis OCT|99.8|3|12|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032023120024|百胜|X8 Pro|179.5|3|9.5|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030012022110001|百胜|X8 Pro|147.9|3|9.5|整机全保
+通州|医保中心超声科|彩色多普勒超声诊断仪|3220501032023120020|百胜|X8 Pro|149.8|3|9.5|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501030022019020001|百胜|Mylab Class C|129.6|1|8.8|整机全保
+顺义|消毒供应中心|环氧乙烷灭菌器|3229900002023120741|3M|GS8-1D|135|3|6.5|整机全保
+顺义|消毒供应中心|环氧乙烷灭菌器|3229900002023120742|3M|GS8-1D|135|3|6.5|整机全保
+顺义|消毒供应中心|环氧乙烷解析器|3222507992023120017|3M|50AN|55|3|2.3|整机全保
+通州|消毒供应中心|环氧乙烷低温灭菌柜|3222504040012023080001|3M|GS8-1D|135|3|6.5|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032024010015|德润特|DD70|179.7|3|10.46|整机全保
+顺义|超声科|彩色多普勒超声诊断仪|3220501032024010003|德润特|DD70|179.6|3|10.46|整机全保
+西城|放射科|移动床旁DR|3221101020062020010001|迈瑞|MobiEye 700|149|3|8.5|整机全保
+西城|放射科|移动床旁DR|3221101020062019010001|迈瑞|MobiEye 700|149|3|8.5|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030032022020001|开立|s60Pro|179.6|3|7|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030032023090001|开立|P40 Plus|59.9|3|3.5|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030032023090002|开立|P40 Plus|59.9|3|3.5|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030022018080001|开立|S50|165.5|1|7.8|整机全保
+通州|内镜中心|蓝光光源高清内镜系统|3220799000012023120001|富士|VP-7000|600|1|30|整机全保
+西城|内镜中心|电子内镜系统|3220799000012020040001|富士|VP-7000|160|1|14.8|整机全保
+通州|放射科|移动床旁DR|3229900002023120469|锐珂|DRX-Rise|79.95|3|14|不含球管
+通州|超声科|彩色多普勒超声诊断仪|3220501030022021040003|日立|HI VISION Ascendus|149|3|10|整机全保
+西城|超声科|彩色多普勒超声诊断仪|3220501030022019010001|日立|ARIETTA 70|253|1|10.46|整机全保
+通州|放射科|移动床旁DR|3221101020062019040001|岛津|MUX-200D|149.5|3|13|整机全保
+顺义|内镜中心|专用体外超声内镜|3220703062023120002|富士|ARIETTA 70|340|1|5|整机全保，配合宾得内镜使用
+顺义|内镜中心|高清数字彩色影像内镜系统|3220703062023120001|宾得|EPK-i7010|379.6|1|32|整机全保
+西城|口腔科|锥形束三维影像系统|3221103010032014050001|NewTom|5G version FP|260|3|11|整机全保
+通州|药剂科|全自动药品核对系统|3221802990032019090001|MDM|MDM2|150.4|2|6.1|整机全保
+通州|药剂科|全自动单剂量分包机|3221802990012019090001|东商|Xana-U4002|175.9|2|7.9|整机全保
+西城|心内科|多导生理记录仪|3220307070012010050001|GE|combolab7000|147.5|3|8|整机全保
+顺义|药剂科|小微药房自助取药机|3229900002024060001|英特吉|BY-2800L|49.75|2|3.5|整机全保
+顺义|药剂科|小微药房自助取药机|3229900002024010002|英特吉|BY-2800L|49.75|2|3.5|整机全保
+顺义|药剂科|小微药房自助取药机|3229900002024010003|英特吉|BY-2800L|49.75|2|3.5|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501002025040035|西门子|ACUSONS3000|209.95|1|8.75|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501002025040036|西门子|ACUSONS3000|209.95|1|8.75|整机全保
+西城|眼科|眼科光学生物测量仪|3229900000012023120005|ZEISS|IOLMaster 700|70|3|4.9|整机全保
+通州|心内科|电生理导航系统|3220399000012019090001|强生|FG-5400-00|188|1|7|整机全保
+西城|心内科|电生理导航系统|3220399000012019070001|强生|FG-5400-00|350|1|7|整机全保
+通州|医保中心二门诊眼科|OCTA|3220401382023120001|赛炜|VG200D|189|3|4.5|整机全保
+通州|超声科|便携式超声诊断仪|3220501002025040039|飞依诺|VINNO 8|59|3|4|整机全保
+通州|超声科|彩色多普勒超声诊断仪|3220501030022020070003|声科|Aixplorer V|219.8|1|9.5|整机全保
+西城|眼科|眼前结测量评估系统|3220304050012018090001|OCULUS|70700|71|1|5|整机全保
+西城|眼科|干眼检查仪|3220401990012018100001|OCULUS|77000|64|1|4|整机全保
+顺义|口腔科|锥形束三维影像系统|3229900002023120774|朗视|Smart3D-Xs|30|3|2|整机全保
+#2027年教学设备购置计划|
+顺义院区|临床技能中心|男性不透明导尿模型|新增|0.6|4|国产|
+顺义院区|临床技能中心|女性不透明导尿模型|新增|0.6|4|国产|
+顺义院区|临床技能中心|股动脉穿刺模型|新增|0.605|8|国产|
+顺义院区|临床技能中心|开关腹模型|首配|0.275|8|国产|
+顺义院区|临床技能中心|脊柱损伤搬运套装|新增|2.75|1|国产|
+顺义院区|临床技能中心|氧气瓶模型套装|首配|0.33|2|国产|
+西城院区|临床技能中心|孕妇腹部触诊模型|更新|1.68|4|国产|
+西城院区|临床技能中心|教学心电图机|更新|1.7|5|国产|
+西城院区|临床技能中心|膝关节穿刺模型|首配|0.35|3|国产|
+西城院区|临床技能中心|AI虚拟诊断教学系统|首配|20|2|国产|
+西城院区|临床技能中心|国际生教学辅助翻译系统|首配|15.1|1|国产|
+西城院区|临床技能中心|深静脉穿刺虚实结合训练模型|首配|3.5|2|国产|
+西城院区|临床技能中心|腹腔镜手术模拟训练系统-切口疝手术及腹股沟疝手术模块|新增|60|1|国产|
+顺义院区|消化中心|消化内镜智慧教学系统|首配|250|1|国产|
+顺义院区|神经外科|全息三维术前规划及混合现实手术导航系统|首配|100|1|国产|
+西城院区|心内科|介入术虚拟训练系统|首配|150|1|国产|
+通州院区|全科医学科|挂壁式组合诊断系统|首配|2|2|国产|
+顺义院区|口腔科|智能化口腔综合教学系统|首配|65|1|国产|
+西城院区|皮肤性病科|多光谱皮肤镜图像处理教学工作站|首配|35|1|国产|
+西城院区|耳鼻咽喉头颈外科|数智化耳鼻喉手术远程示教信息系统|首配|35|1|国产|
+顺义院区|超声科|超声检查模拟训练系统|新增|120|1|国产|
+西城院区|眼科|教学用裂隙灯显微镜|新增|13|1|国产|
+西城院区|眼科|教学用电脑角膜验光仪|更新|10|1|国产|
+西城院区|神经内科|可视化腰段椎管内麻醉套装|首配|60|1|国产|
+#2026年度学科建设专项|
+通州|普外分中心|超算迷你电脑主机工作站|首配|3.35|1|进口|
+通州|普外分中心|人工智能计算工作站|首配|1.3|4|进口|
+通州|普外分中心|NAS网络存储主机|首配|0.45|1|进口|
+通州|普外分中心|NAS硬盘|首配|0.25|4|进口|
+顺义|普外分中心|恒压气腹机|首配|3.33|3|进口|
+西城|普外分中心|气腹机系统|首配|3.33|3|国产|
+西铁营|普外分中心|核酸凝胶成像仪|首配|6|1|国产|
+西铁营|普外分中心|倒置普通显微镜|新增|5|1|国产|
+顺义|普外分中心|双人双目手术显微镜|首配|6.5|1|国产|
+顺义|普外分中心|小动物吸入式麻醉机|首配|2.5|1|国产|
+通州|普外分中心|多频率生物电阻抗人体成分分析仪|首配|9.9|1|国产|
+西城|血管外科|血管斑块璇切控制装置|首配|10|1|进口|
+西城|血管外科|血管内超声诊断仪|首配|9.8|1|国产|
+西城|康复医学科|迷走神经电刺激器|首配|0.98|2|国产|
+顺义|康复医学科|血流限制训练带|首配|1|1|进口|
+西城|肝病分中心|负80超低温冰箱|新增|7|1|国产|
+西城|肝病分中心|细胞培养箱|新增|5.5|1|国产|
+西城|肝病分中心|医用冷藏冷冻箱|新增|0.89|2|国产|
+西城|肝病分中心|恒温混匀金属浴|新增|0.38|1|国产|
+顺义|中医科|滴注推拉机|首配|4.5|1|国产|
+顺义|中医科|真空过滤器（全套）|首配|0.72|2|国产|
+顺义|中医科|单头膏体灌装机|首配|0.5|2|国产|
+顺义|中医科|封口机|首配|0.8|1|国产|
+顺义|中医科|艾灸治疗仪（铺灸）|首配|3.5|1|国产|
+顺义|神经外科|高频手术设备（高频电刀）|首配|9.9|1|国产|
+西城|皮肤性病科|皮肤生理指标检测仪|更新|9.9|1|国产|
+西城|神经内科|负80超低温冰箱|首配|3|1|国产|
+通州|神经内科|负80超低温冰箱|首配|3|1|国产|
+顺义|神经内科|负80超低温冰箱|首配|3|1|国产|
+顺义|北京市临床医学研究所|包埋机|首配|3.8|1|国产|需要有冷台
+顺义|北京市临床医学研究所|智能数显液氮罐|新增|2.2|1|国产|容量50L，有报警装置
+通州|护理学科|电子上消化道插管用内窥镜|首配|5.9|1|国产|
+#高层次人才计划-牛延涛|
+西城|放射科|5岁人体仿真模体|首配|45|1|进口|
+#院士实验室|
+西城|院士实验室|图像处理服务器|首配|45|2|国产|
+西城|院士实验室|科学计算服务器|首配|92.05|1|国产|
+西城|院士实验室|大数据存储服务器|首配|18|1|国产|
+西城|院士实验室|NAS存储|首配|5|1|国产|
+西城|院士实验室|液氮罐|首配|2.37|1|国产|
+西城|院士实验室|2-8℃医用冷藏冰箱|首配|1.5|3|国产|
+西城|院士实验室|风冷低温储存箱（-40）|首配|4|1|国产|
+西城|院士实验室|负80冰箱（340L)|首配|2.8|1|国产|
+西城|院士实验室|高压灭菌锅|首配|1.3|1|国产|
+西城|院士实验室|双开门双温冰箱|首配|2.6|2|国产|
+西城|院士实验室|超声波清洗仪|首配|0.5|3|国产|
+西城|院士实验室|千分之一天平|首配|0.65|1|国产|
+西城|院士实验室|全波长酶标仪全光谱分子生物酶联免疫自动检测紫外可见分光光度计|首配|7.5|1|国产|
+西城|院士实验室|电热鼓风干燥箱|首配|0.35|2|国产|
+西城|院士实验室|台式15ml管常温离心机（转速5000r以下）|首配|1|1|国产|
+西城|院士实验室|小型桌面高速冷冻离心机|首配|2.2|2|国产|
+西城|院士实验室|纯水仪|首配|3.3|1|国产|
+西城|院士实验室|万分之一电子天平|首配|0.4|1|国产|
+西城|院士实验室|精确控温摇床（可制冷4-37度）|首配|2.3|1|国产|
+西城|院士实验室|倒置荧光显微镜(4-6色荧光通道）|首配|6.5|1|国产|
+西城|院士实验室|制冰机|首配|0.8|1|国产|
+西城|院士实验室|蛋白电泳及转膜系统整套|首配|2.5|2|国产|
+西城|院士实验室|超声破碎仪|首配|1.1|1|国产|
+西城|院士实验室|超声清洗器|首配|0.8|3|国产|
+西城|院士实验室|蛋白脱色摇床|首配|0.35|2|国产|
+西城|院士实验室|1ml移液器|首配|0.175|3|国产|
+西城|院士实验室|200ul移液器|首配|0.175|3|国产|
+西城|院士实验室|100ul移液器|首配|0.175|3|国产|
+西城|院士实验室|20ul移液器|首配|0.175|3|国产|
+西城|院士实验室|10ul移液器|首配|0.175|3|国产|
+西城|院士实验室|2.5ul移液器|首配|0.175|3|国产|
+西城|院士实验室|10ml移液器|首配|0.175|2|国产|
+西城|院士实验室|八道可调移液器|首配|0.75|3|国产|
+西城|院士实验室|ph计|首配|0.2|2|国产|
+西城|院士实验室|实验室用冷冻干燥机|首配|1.5|1|国产|
+西城|院士实验室|大容量高速冷冻离心机（含不同量程的转子15-50mL）|首配|4.5|1|国产|
+西城|院士实验室|针筒式脂质体挤出器LipoSofast|首配|0.9|1|国产|
+西城|院士实验室|十二道可调移液器|首配|0.75|3|国产|
+西城|院士实验室|化学发光凝胶成像系统|首配|8|1|国产|
+西城|院士实验室|磁力搅拌器|首配|0.2|3|国产|
+西城|院士实验室|恒温金属浴|首配|0.55|3|国产|
+西城|院士实验室|光学显微镜|首配|1|1|国产|
+西城|院士实验室|细胞计数仪|首配|1.5|1|国产|
+西城|院士实验室|单细胞悬液制备仪|首配|8.5|1|国产|
+西城|院士实验室|小动物光热成像仪|首配|2.8|1|国产|
+西城|院士实验室|化学药品柜|首配|0.3|3|国产|
+西城|院士实验室|粘度计|首配|0.3|1|国产|
+#研究型病房|
+通州|研究型病房|智能流动仪|首配|18|1|国产|
+通州|研究型病房|自动化冰箱|首配|25|1|国产|
+通州|研究型病房|智能药柜|首配|11|2|国产|
+通州|研究型病房|智能档案柜|首配|11|2|国产|
+通州|研究型病房|医用冷藏箱|新增|1.5|6|国产|
+#急诊|
+西城|急诊科|便携式数字化彩色超声诊断仪|首配|60|1|国产|
+`;
+
+/* ============================================================
+   2. 解析数据
+   ============================================================ */
+function parseData() {
+  const lines = RAW_DATA.trim().split('\n');
+  const sheets = [];
+  let cur = null;
+  lines.forEach(line => {
+    if (line.startsWith('#')) {
+      const parts = line.slice(1).split('|');
+      cur = { name: parts[0], type: parts[1] || 'normal', rows: [] };
+      sheets.push(cur);
+    } else if (line.trim() && cur) {
+      cur.rows.push(line.split('|'));
+    }
+  });
+  return sheets.map(s => ({
+    name: s.name,
+    type: s.type,
+    items: s.rows.map(r => {
+      if (s.type === 'maint') {
+        const price = Number(r[8]) || 0;
+        const years = Number(r[7]) || 0;
+        return {
+          area: r[0], dept: r[1], name: r[2],
+          cat: '维保', price, qty: years,
+          total: +(price * years).toFixed(2), origin: '',
+          note: [r[4], r[5], r[3] ? ('资产编号 ' + r[3]) : '', r[9]].filter(Boolean).join(' · ')
+        };
+      }
+      const price = Number(r[4]) || 0;
+      const qty = Number(r[5]) || 0;
+      return {
+        area: r[0], dept: r[1], name: r[2], cat: r[3],
+        price, qty, total: +(price * qty).toFixed(2),
+        origin: r[6], note: r[7] || ''
+      };
+    })
+  }));
+}
+
+const SHEETS = parseData();
+const TOTAL = SHEETS.reduce((n, s) => n + s.items.length, 0);
+
+/* ============================================================
+   3. 状态
+   ============================================================ */
+const state = { voter: { name: '' }, votes: {}, signData: '', activeSheet: 0 };
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => { const v = Number(n); return isFinite(v) ? String(Math.round(v * 100) / 100) : String(n == null ? '' : n); };
+const fmtDateTime = (d = new Date()) => {
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+};
+const voteKey = (si, ri) => si + '-' + ri;
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (name === 'vote') renderVote();
+  if (name === 'done') renderDone();
+  if (name === 'admin') renderAdmin();
+  window.scrollTo(0, 0);
+}
+function getStats() {
+  let yes = 0, no = 0, abstain = 0, amount = 0;
+  SHEETS.forEach((s, si) => s.items.forEach((it, ri) => {
+    const v = state.votes[voteKey(si, ri)];
+    if (v === 1) { yes++; amount += it.total; }
+    else if (v === 0) no++;
+    else abstain++;
+  }));
+  return { yes, no, abstain, amount: Math.round(amount * 100) / 100 };
+}
+
+/* ============================================================
+   4. 首页
+   ============================================================ */
+function renderHome() {
+  $('#view-home').innerHTML = `
+  <div class="hero">
+    <h1>设备委员会委员投票</h1>
+    <p>2027年度设备购置计划 · 线上表决</p>
+  </div>
+  <div class="form-card">
+    <div class="field">
+      <label>委员姓名 <span class="req">*</span></label>
+      <input id="inName" type="text" placeholder="请输入您的姓名" autocomplete="off">
+    </div>
+    <button class="btn primary block" id="btnStart">开始投票</button>
+  </div>
+  <div class="stat-bar">
+    <div><b>${SHEETS.length}</b><span>个表决批次</span></div>
+    <div><b>${TOTAL}</b><span>项表决事项</span></div>
+  </div>
+  <div class="foot-note">
+    请各位委员逐项审阅后表决<br>提交时需手写签名确认
+  </div>`;
+  $('#btnStart').onclick = () => {
+    const name = $('#inName').value.trim();
+    if (!name) { alert('请输入姓名'); return; }
+    state.voter.name = name;
+    showView('vote');
+  };
+}
+
+/* ============================================================
+   5. 投票页
+   ============================================================ */
+function renderVote() {
+  $('#view-vote').innerHTML = `
+  <div class="topbar">
+    <div>
+      <div class="tb-title">设备购置表决</div>
+      <div class="tb-sub">${esc(state.voter.name)}</div>
+    </div>
+    <div class="tb-prog">已表决 <b id="progNum">0</b>/${TOTAL}</div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="sheetBody"></div>
+  <div class="bottombar">
+    <button class="btn ghost" id="btnQuickAll">全部同意</button>
+    <button class="btn primary" id="btnSubmit">提交并签名</button>
+  </div>`;
+  renderTabs();
+  renderSheetBody(state.activeSheet);
+  $('#btnQuickAll').onclick = () => {
+    if (!confirm('确定将所有「未表决」事项统一标记为「同意」吗？')) return;
+    SHEETS.forEach((s, si) => s.items.forEach((it, ri) => {
+      const k = voteKey(si, ri);
+      if (state.votes[k] === undefined) state.votes[k] = 1;
+    }));
+    renderTabs(); renderSheetBody(state.activeSheet);
+  };
+  $('#btnSubmit').onclick = openSign;
+}
+
+function renderTabs() {
+  const tabs = $('#tabs');
+  tabs.innerHTML = SHEETS.map((s, si) => {
+    const done = s.items.filter((it, ri) => state.votes[voteKey(si, ri)] !== undefined).length;
+    const cls = si === state.activeSheet ? 'tab on' : 'tab';
+    let badge = '';
+    if (done === s.items.length && done > 0) badge = `<span class="badge done">${done}</span>`;
+    else if (done > 0) badge = `<span class="badge">${done}</span>`;
+    return `<div class="${cls}" data-si="${si}">${esc(s.name)}${badge}</div>`;
+  }).join('');
+  tabs.querySelectorAll('.tab').forEach(t => {
+    t.onclick = () => {
+      state.activeSheet = +t.dataset.si;
+      renderTabs(); renderSheetBody(state.activeSheet);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  });
+  $('#progNum').textContent = Object.keys(state.votes).length;
+}
+
+function renderSheetBody(si) {
+  const s = SHEETS[si];
+  if (!s) return;
+  const isMaint = s.type === 'maint';
+  let h = `
+  <div class="sheet-head">
+    <span class="sh-title">${esc(s.name)}</span>
+    <span class="sh-count">共 ${s.items.length} 项</span>
+  </div>
+  <div class="sheet-ops">
+    <button class="op" data-op="yes" data-si="${si}">本表全部同意</button>
+    <button class="op" data-op="no" data-si="${si}">本表全部不同意</button>
+    <button class="op" data-op="clear" data-si="${si}">清空本表</button>
+  </div>
+  <div class="list">`;
+  s.items.forEach((it, ri) => {
+    const k = voteKey(si, ri);
+    const v = state.votes[k];
+    const cls = v === 1 ? 'yes' : v === 0 ? 'no' : '';
+    h += `
+    <div class="item ${cls}">
+      <div class="item-top">
+        <span class="idx">${ri + 1}</span>
+        <span class="name">${esc(it.name)}</span>
+      </div>
+      <div class="meta">
+        <span class="tag">${esc(it.area)}</span>
+        <span class="tag">${esc(it.dept)}</span>
+        ${it.cat ? `<span class="tag cat">${esc(it.cat)}</span>` : ''}
+        ${it.origin ? `<span class="tag ${it.origin === '进口' ? 'imp' : ''}">${esc(it.origin)}</span>` : ''}
+      </div>
+      <div class="price">
+        ${isMaint
+          ? `年度维保 ${fmt(it.price)} 万 × ${it.qty} 年 = <b>${fmt(it.total)} 万</b>`
+          : `单价 ${fmt(it.price)} 万 × ${it.qty} = <b>${fmt(it.total)} 万</b>`}
+      </div>
+      ${it.note ? `<div class="note">备注：${esc(it.note)}</div>` : ''}
+      <div class="btns">
+        <button class="vbtn yes ${v === 1 ? 'active' : ''}" data-key="${k}" data-v="1">✓ 同意</button>
+        <button class="vbtn no ${v === 0 ? 'active' : ''}" data-key="${k}" data-v="0">✕ 不同意</button>
+      </div>
+    </div>`;
+  });
+  h += `</div>`;
+  $('#sheetBody').innerHTML = h;
+  $('#sheetBody').querySelectorAll('.vbtn').forEach(b => {
+    b.onclick = () => setVote(b.dataset.key, +b.dataset.v);
+  });
+  $('#sheetBody').querySelectorAll('.op').forEach(b => {
+    b.onclick = () => batchOp(+b.dataset.si, b.dataset.op);
+  });
+}
+
+function setVote(key, v) {
+  if (state.votes[key] === v) delete state.votes[key];
+  else state.votes[key] = v;
+  const btn = document.querySelector('.vbtn[data-key="' + key + '"]');
+  if (btn) {
+    const card = btn.closest('.item');
+    const nv = state.votes[key];
+    card.classList.toggle('yes', nv === 1);
+    card.classList.toggle('no', nv === 0);
+    card.querySelectorAll('.vbtn').forEach(b => b.classList.toggle('active', +b.dataset.v === nv));
+  }
+  renderTabs();
+}
+
+function batchOp(si, op) {
+  const s = SHEETS[si];
+  if (op === 'clear' && !confirm('确定清空本批次全部表决吗？')) return;
+  s.items.forEach((it, ri) => {
+    const k = voteKey(si, ri);
+    if (op === 'yes') state.votes[k] = 1;
+    else if (op === 'no') state.votes[k] = 0;
+    else delete state.votes[k];
+  });
+  renderTabs(); renderSheetBody(si);
+}
+
+/* ============================================================
+   6. 签名 + 提交
+   ============================================================ */
+function openSign() {
+  const st = getStats();
+  if (st.abstain > 0 && !confirm(`还有 ${st.abstain} 项未表决，将记为「弃权」。确定提交吗？`)) return;
+  showSignModal();
+}
+
+function showSignModal() {
+  const old = document.getElementById('signModal');
+  if (old) old.remove();
+  const st = getStats();
+  const modal = document.createElement('div');
+  modal.id = 'signModal';
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-box">
+      <div class="mb-title">手写签名确认</div>
+      <div class="mb-tip">本人已审阅上述全部表决事项，所填意见真实有效</div>
+      <div class="sign-stats">
+        <span class="ok">同意 ${st.yes}</span>
+        <span class="bad">不同意 ${st.no}</span>
+        <span class="gray">弃权 ${st.abstain}</span>
+      </div>
+      <canvas id="signPad"></canvas>
+      <div class="sign-hint">请用手指在虚线框内签名</div>
+      <div class="sign-ops">
+        <button class="btn ghost" id="btnClearSign">重新签名</button>
+        <button class="btn primary" id="btnDoSign" style="flex:1">确认提交</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  requestAnimationFrame(() => {
+    const pad = initSignPad();
+    $('#btnClearSign').onclick = () => pad && pad.clear();
+    $('#btnDoSign').onclick = () => doSubmit(pad);
+  });
+}
+
+function initSignPad() {
+  const canvas = document.getElementById('signPad');
+  if (!canvas) return null;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width || 320, h = rect.height || 200;
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+  ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#111111';
+  let drawing = false, ink = false;
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  };
+  const down = e => { e.preventDefault(); drawing = true; ink = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+  const move = e => { if (!drawing) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+  const up = () => { drawing = false; };
+  canvas.addEventListener('touchstart', down, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', up);
+  canvas.addEventListener('touchcancel', up);
+  canvas.addEventListener('mousedown', down);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', up);
+  canvas.addEventListener('mouseleave', up);
+  return {
+    hasInk: () => ink,
+    clear() { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = '#111111'; ink = false; },
+    toDataURL: () => canvas.toDataURL('image/png')
+  };
+}
+
+async function doSubmit(pad) {
+  if (!pad || !pad.hasInk()) { alert('请先手写签名'); return; }
+  const btn = document.getElementById('btnDoSign');
+  if (btn) { btn.disabled = true; btn.textContent = '提交中…'; }
+
+  state.signData = pad.toDataURL();
+  const st = getStats();
+
+  // 尝试提交到云端
+  let cloudOk = false;
+  if (CONFIG.supabaseUrl && CONFIG.supabaseKey) {
+    try {
+      const res = await fetch(`${CONFIG.supabaseUrl}/rest/v1/votes`, {
+        method: 'POST',
+        headers: {
+          'apikey': CONFIG.supabaseKey,
+          'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          voter_name: state.voter.name,
+          signature: state.signData,
+          votes: state.votes,
+          stats: st
+        })
+      });
+      cloudOk = res.ok;
+      if (!res.ok) {
+        const t = await res.text();
+        console.error('云端提交失败：', res.status, t);
+      }
+    } catch (e) {
+      console.error('云端提交异常：', e);
+    }
+  }
+
+  const modal = document.getElementById('signModal');
+  if (modal) modal.remove();
+
+  if (!cloudOk) {
+    alert('提交到服务器失败，请检查网络后重试。\n（如管理员尚未配置服务器，请联系管理员）');
+    return;
+  }
+
+  showView('done');
+}
+
+/* ============================================================
+   7. 完成页
+   ============================================================ */
+function renderDone() {
+  const st = getStats();
+  $('#view-done').innerHTML = `
+  <div class="done-wrap">
+    <div class="done-icon">✓</div>
+    <h2>表决已提交</h2>
+    <p>${esc(state.voter.name)}<br>${fmtDateTime()}</p>
+    <div class="done-stats">
+      <div><b style="color:#00a03e">${st.yes}</b><span>同意</span></div>
+      <div><b style="color:#d03050">${st.no}</b><span>不同意</span></div>
+      <div><b style="color:#86909c">${st.abstain}</b><span>弃权</span></div>
+    </div>
+    <p style="font-size:12px;color:#86909c;margin-top:20px;">您的表决已记录，无需再做其他操作</p>
+  </div>`;
+}
+
+/* ============================================================
+   8. 管理员登录
+   ============================================================ */
+function renderAdminLogin() {
+  $('#view-adminlogin').innerHTML = `
+  <div class="hero">
+    <h1>管理端</h1>
+    <p>设备委员会表决结果查看</p>
+  </div>
+  <div class="form-card">
+    <div class="field">
+      <label>管理员密码</label>
+      <input id="inPwd" type="password" placeholder="请输入管理员密码">
+    </div>
+    <button class="btn primary block" id="btnAdminLogin">登录</button>
+  </div>`;
+  $('#btnAdminLogin').onclick = () => {
+    const pwd = $('#inPwd').value;
+    if (pwd === CONFIG.adminPassword) {
+      sessionStorage.setItem('admin_ok', '1');
+      showView('admin');
+    } else {
+      alert('密码错误');
+    }
+  };
+}
+
+/* ============================================================
+   9. 管理员视图
+   ============================================================ */
+async function renderAdmin() {
+  $('#view-admin').innerHTML = `
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <h2>表决结果汇总</h2>
+      <div id="adminInfo" style="font-size:13px;color:#86909c;">加载中…</div>
+      <div style="margin-top:14px;display:flex;gap:10px;">
+        <button class="btn ghost" id="btnRefresh" style="flex:1;height:40px;font-size:13px;">刷新</button>
+        <button class="btn primary" id="btnExportAll" style="flex:1;height:40px;font-size:13px;">导出汇总PDF</button>
+        <button class="btn danger" id="btnLogout" style="height:40px;font-size:13px;">退出</button>
+      </div>
+    </div>
+    <div class="admin-list" id="adminList">
+      <div class="empty">加载中…</div>
+    </div>
+  </div>`;
+
+  $('#btnRefresh').onclick = loadAdminData;
+  $('#btnLogout').onclick = () => { sessionStorage.removeItem('admin_ok'); showView('home'); };
+  $('#btnExportAll').onclick = exportAllPDF;
+
+  loadAdminData();
+}
+
+let ADMIN_DATA = [];
+
+async function loadAdminData() {
+  const list = $('#adminList');
+  const info = $('#adminInfo');
+  if (!CONFIG.supabaseUrl || !CONFIG.supabaseKey) {
+    list.innerHTML = '<div class="empty">未配置服务器地址<br>请在代码中填写 CONFIG.supabaseUrl 和 CONFIG.supabaseKey</div>';
+    info.textContent = '';
+    return;
+  }
+  try {
+    const res = await fetch(`${CONFIG.supabaseUrl}/rest/v1/votes?select=*&order=submitted_at.desc`, {
+      headers: {
+        'apikey': CONFIG.supabaseKey,
+        'Authorization': `Bearer ${CONFIG.supabaseKey}`
+      }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    ADMIN_DATA = await res.json();
+    info.textContent = `共收到 ${ADMIN_DATA.length} 份表决`;
+    if (ADMIN_DATA.length === 0) {
+      list.innerHTML = '<div class="empty">暂无表决数据</div>';
+      return;
+    }
+    list.innerHTML = ADMIN_DATA.map(r => {
+      const st = r.stats || {};
+      const tm = r.submitted_at ? r.submitted_at.replace('T', ' ').slice(0, 16) : '';
+      return `<div class="admin-row">
+        <div>
+          <div class="nm">${esc(r.voter_name)}</div>
+          <div class="tm">${tm}</div>
+          <div class="st">
+            <span class="y">同意 ${st.yes || 0}</span> ·
+            <span class="n">不同意 ${st.no || 0}</span> ·
+            <span class="a">弃权 ${st.abstain || 0}</span>
+          </div>
+        </div>
+        <button class="btn ghost" style="height:32px;font-size:12px;padding:0 12px;" data-id="${r.id}">导出PDF</button>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('button[data-id]').forEach(b => {
+      b.onclick = () => exportOnePDF(+b.dataset.id);
+    });
+  } catch (e) {
+    list.innerHTML = '<div class="empty">加载失败：' + esc(e.message) + '</div>';
+  }
+}
+
+/* ============================================================
+   10. PDF 生成
+   ============================================================ */
+const TD = 'border:0.5pt solid #999;padding:1.4mm 1mm;vertical-align:top;word-break:break-all;';
+const TH = 'border:0.5pt solid #999;padding:1.4mm 1mm;background:#eef3f9;font-weight:700;text-align:center;';
+
+function buildReportNode(record) {
+  const div = document.createElement('div');
+  div.style.cssText = 'position:absolute;left:-9999px;top:0;width:180mm;background:#fff;color:#000;font-family:"PingFang SC","Microsoft YaHei",SimSun,sans-serif;';
+  const votes = record.votes || {};
+  const st = record.stats || { yes: 0, no: 0, abstain: 0, amount: 0 };
+  const name = record.voter_name || '';
+  const sign = record.signature || '';
+  const time = record.submitted_at ? record.submitted_at.replace('T', ' ').slice(0, 16) : fmtDateTime();
+  const dateStr = record.submitted_at ? record.submitted_at.slice(0, 10) : '';
+
+  let html = `
+  <div style="text-align:center;padding:4mm 0 3mm;">
+    <div style="font-size:17pt;font-weight:700;letter-spacing:3px;">设备委员会委员表决表</div>
+    <div style="font-size:9pt;color:#666;margin-top:1.5mm;">2027年度设备购置计划</div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-bottom:3mm;">
+    <tr>
+      <td style="padding:1.5mm 0;">委员姓名：<b>${esc(name)}</b></td>
+      <td style="padding:1.5mm 0;text-align:right;">表决时间：${esc(time)}</td>
+    </tr>
+  </table>
+  <div style="font-size:9pt;background:#f5f7fa;border:0.5pt solid #d5dae0;padding:2.5mm 3mm;margin-bottom:4mm;">
+    表决汇总：共 ${TOTAL} 项 —
+    <b style="color:#00843d;">同意 ${st.yes || 0} 项</b>，
+    <b style="color:#c00000;">不同意 ${st.no || 0} 项</b>，
+    <span style="color:#666;">弃权 ${st.abstain || 0} 项</span>。
+    同意项目合计金额 <b>${st.amount || 0}</b> 万元。
+  </div>`;
+
+  SHEETS.forEach((s, si) => {
+    const isMaint = s.type === 'maint';
+    html += `
+    <div style="margin-bottom:5mm;">
+      <div style="font-size:10.5pt;font-weight:700;margin:0 0 1.5mm;padding-left:2mm;border-left:2.5pt solid #1565c0;">
+        ${esc(s.name)}
+        <span style="font-size:8.5pt;font-weight:400;color:#666;">（共 ${s.items.length} 项）</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt;table-layout:fixed;">
+        <thead><tr>
+          <th style="${TH}width:8mm;">序号</th>
+          <th style="${TH}width:11mm;">院区</th>
+          <th style="${TH}width:26mm;">科室</th>
+          <th style="${TH}">设备名称</th>
+          <th style="${TH}width:15mm;">${isMaint ? '年度费用' : '单价'}<br>(万)</th>
+          <th style="${TH}width:10mm;">${isMaint ? '年限' : '数量'}</th>
+          <th style="${TH}width:15mm;">金额<br>(万)</th>
+          <th style="${TH}width:14mm;">表决</th>
+        </tr></thead><tbody>`;
+    s.items.forEach((it, ri) => {
+      const v = votes[voteKey(si, ri)];
+      const txt = v === 1 ? '同意' : v === 0 ? '不同意' : '弃权';
+      const color = v === 1 ? '#00843d' : v === 0 ? '#c00000' : '#888888';
+      html += `<tr>
+        <td style="${TD}text-align:center;">${ri + 1}</td>
+        <td style="${TD}text-align:center;">${esc(it.area)}</td>
+        <td style="${TD}">${esc(it.dept)}</td>
+        <td style="${TD}">${esc(it.name)}${it.note ? `<div style="font-size:7pt;color:#888;margin-top:0.8mm;">${esc(it.note)}</div>` : ''}</td>
+        <td style="${TD}text-align:right;">${fmt(it.price)}</td>
+        <td style="${TD}text-align:center;">${it.qty}</td>
+        <td style="${TD}text-align:right;">${fmt(it.total)}</td>
+        <td style="${TD}text-align:center;color:${color};font-weight:700;">${txt}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  });
+
+  html += `
+  <div style="margin-top:10mm;page-break-inside:avoid;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="width:60%;vertical-align:bottom;padding-bottom:2mm;">
+          <div style="font-size:10pt;margin-bottom:2mm;">委员签名：</div>
+          ${sign ? `<img src="${sign}" style="max-height:22mm;max-width:80mm;border-bottom:0.5pt solid #999;padding-bottom:1mm;">` : '<div style="height:22mm;border-bottom:0.5pt solid #999;"></div>'}
+        </td>
+        <td style="width:40%;vertical-align:bottom;text-align:right;padding-bottom:2mm;font-size:10pt;">
+          日期：${dateStr || fmtDateTime().slice(0, 10)}
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div style="margin-top:6mm;font-size:7.5pt;color:#999;text-align:center;">
+    本表由设备委员会委员线上表决系统生成 · ${esc(time)} · 共 ${TOTAL} 项
+  </div>`;
+  div.innerHTML = html;
+  return div;
+}
+
+async function exportOnePDF(id) {
+  const rec = ADMIN_DATA.find(r => r.id === id);
+  if (!rec) { alert('记录不存在'); return; }
+  await generatePDF([rec], '设备委员会表决表_' + rec.voter_name + '.pdf');
+}
+
+async function exportAllPDF() {
+  if (ADMIN_DATA.length === 0) { alert('暂无数据'); return; }
+  await generatePDF(ADMIN_DATA, '设备委员会表决汇总_' + ADMIN_DATA.length + '人.pdf');
+}
+
+async function generatePDF(records, fileName) {
+  if (typeof html2pdf === 'undefined') { alert('PDF 组件加载失败'); return; }
+  const overlay = document.createElement('div');
+  overlay.className = 'loading-overlay';
+  overlay.innerHTML = '<div class="spinner"></div><div>正在生成 PDF，请稍候…</div>';
+  document.body.appendChild(overlay);
+
+  const wrapper = document.createElement('div');
+  records.forEach((rec, i) => {
+    const node = buildReportNode(rec);
+    if (i > 0) node.style.pageBreakBefore = 'always';
+    wrapper.appendChild(node);
+  });
+  document.body.appendChild(wrapper);
+
+  try {
+    await new Promise(r => setTimeout(r, 400));
+    await html2pdf().set({
+      margin: [8, 8, 12, 8],
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.92 },
+      html2canvas: { scale: 1.5, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' }
+    }).from(wrapper).save();
+  } catch (e) {
+    console.error(e);
+    alert('PDF 生成失败：' + e.message);
+  } finally {
+    wrapper.remove();
+    overlay.remove();
+  }
+}
+
+/* ============================================================
+   11. 启动
+   ============================================================ */
+(function init() {
+  const qs = new URLSearchParams(location.search);
+  renderHome();
+  renderAdminLogin();
+
+  if (qs.get('admin') === '1') {
+    if (sessionStorage.getItem('admin_ok') === '1') showView('admin');
+    else showView('adminlogin');
+  } else {
+    showView('home');
+  }
+})();
+</script>
+</body>
+</html>
